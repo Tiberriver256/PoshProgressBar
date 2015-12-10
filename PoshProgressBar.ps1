@@ -23,9 +23,11 @@ Function New-ProgressBar {
     $syncHash = [hashtable]::Synchronized(@{})
     $newRunspace =[runspacefactory]::CreateRunspace()
     $syncHash.Runspace = $newRunspace
+    $syncHash.Activity = ''
+    $syncHash.PercentComplete = 0
     $newRunspace.ApartmentState = "STA" 
     $newRunspace.ThreadOptions = "ReuseThread"           
-    $newRunspace.Open() 
+    $data = $newRunspace.Open() | Out-Null
     $newRunspace.SessionStateProxy.SetVariable("syncHash",$syncHash)           
     $PowerShellCommand = [PowerShell]::Create().AddScript({    
         [xml]$xaml = @" 
@@ -48,16 +50,31 @@ Function New-ProgressBar {
         #===========================================================================
         $xaml.SelectNodes("//*[@Name]") | %{ $SyncHash."$($_.Name)" = $SyncHash.Window.FindName($_.Name)}
 
+        $updateBlock = {            
+            
+            $SyncHash.Window.Title = $SyncHash.Activity
+            $SyncHash.ProgressBar.Value = $SyncHash.PercentComplete
+                       
+        }
 
         ############### New Blog ##############
-        $syncHash.Window.Add_Closing({
-        
-            $_.Cancel = $True;
-            $_.Visibility = "Not visible"
-
-            #Show Notification Icon here and add double click event to re-show progress bar
-            
-            })
+        $syncHash.Window.Add_SourceInitialized( {            
+            ## Before the window's even displayed ...            
+            ## We'll create a timer            
+            $timer = new-object System.Windows.Threading.DispatcherTimer            
+            ## Which will fire 4 times every second            
+            $timer.Interval = [TimeSpan]"0:0:0.01"            
+            ## And will invoke the $updateBlock            
+            $timer.Add_Tick( $updateBlock )            
+            ## Now start the timer running            
+            $timer.Start()            
+            if( $timer.IsEnabled ) {            
+               Write-Host "Clock is running. Don't forget: RIGHT-CLICK to close it."            
+            } else {            
+               $clock.Close()            
+               Write-Error "Timer didn't start"            
+            }            
+        } )
 
         $syncHash.Window.ShowDialog() | Out-Null 
         $syncHash.Error = $Error 
@@ -77,9 +94,9 @@ Function New-ProgressBar {
                         $Sender.Dispose()
                     } 
                 
-                } 
+                } | Out-Null
 
-    return [System.Collections.Hashtable]$SyncHash
+    return $syncHash
 
 }
  
@@ -89,7 +106,7 @@ function Write-ProgressBar
 
     Param (
         [Parameter(Mandatory=$true)]
-        [System.Object[]]$ProgressBar,
+        $ProgressBar,
         [Parameter(Mandatory=$true)]
         [String]$Activity,
         [String]$Status,
@@ -102,21 +119,12 @@ function Write-ProgressBar
         [int]$SourceID
     ) 
    
-   # This updates the control based on the parameters passed to the function 
-   $ProgressBar.Window.Dispatcher.Invoke([action]{ 
-      
-      $ProgressBar.Window.Title = $Activity
-
-   }, "Normal")
+   $ProgressBar.Activity = $Activity
 
    if($PercentComplete)
    {
-
-       $ProgressBar.Window.Dispatcher.Invoke([action]{ 
       
-          $ProgressBar.ProgressBar.Value = $PercentComplete
-
-       }, "Normal")
+       $ProgressBar.PercentComplete = $PercentComplete
 
    }
 
@@ -141,7 +149,7 @@ function Close-ProgressBar
 
 $ProgressBar = New-ProgressBar
 
-1..100 | foreach {Write-ProgressBar -ProgressBar $ProgressBar -Activity "Counting $_ out of 100" -PercentComplete $_}
+1..100 | foreach {Write-ProgressBar -ProgressBar $ProgressBar -Activity "Counting $_ out of 100" -PercentComplete $_; Start-Sleep -Milliseconds 10}
 
 Close-ProgressBar $ProgressBar
 
@@ -149,7 +157,7 @@ Close-ProgressBar $ProgressBar
 
 $objNotifyIcon = New-Object System.Windows.Forms.NotifyIcon 
 
-$objNotifyIcon.Icon = "C:\Users\tiberriver256\Documents\GitHub\Tiberriver256.GitHub.io\favicon.ico"
+$objNotifyIcon.Icon = "C:\Users\tiberriver256\Docueents\GitHub\Tiberriver256.GitHub.io\favicon.ico"
 $objNotifyIcon.BalloonTipIcon = "Error" 
 $objNotifyIcon.BalloonTipText = "A file needed to complete the operation could not be found." 
 $objNotifyIcon.BalloonTipTitle = "File Not Found"
