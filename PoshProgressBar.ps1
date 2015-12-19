@@ -1,62 +1,202 @@
-﻿<# 
-.SYNOPSIS   
-    This script is used to create a  progress bar 
-.DESCRIPTION   
-    This script uses a Powershell Runspace to create and manage a WPF progress bar that can be manipulated to show 
-    script progress and details.  There are no arguments for this script because it is just an example of how this can be done.   
-    The components within the script are what's important for setting this up for your own purposes. 
-.NOTES   
-    Version        : 1.0 
-    Author        : Rhys Edwards 
-    Email        : powershell@nolimit.to   
-    Credit Due    : Boe Prox wrote in detail about this method of using runspaces and forms, I just applied it to a very  
-                                        common problem 
-    Link        : http://learn-powershell.net/2012/10/14/powershell-and-wpf-writing-data-to-a-ui-from-a-different-runspace/ 
-#> 
+﻿
+
+Function New-ProgressBar 
+{
  
- 
- 
-# Function to facilitate updates to controls within the window 
-Function New-ProgressBar {
- 
+    param(
+        
+        [Bool]$IsIndeterminate = $True,
+
+        [Parameter(ParameterSetName='MaterialDesign')]
+        [switch]$MaterialDesign,
+        
+        [Parameter(ParameterSetName='MaterialDesign')]
+        [ValidateSet("Circle","Horizontal","Vertical")]
+        [String]$Type = "Horizontal",
+
+        [Parameter(ParameterSetName='MaterialDesign')]
+        [ValidateSet("Red","Pink","Purple","DeepPurple","Indigo",
+                      "Blue","LightBlue","Cyan","Teal","Green","LightGreen",
+                      "Lime","Yellow","Amber","Orange","DeepOrange","Brown",
+                      "Grey","BlueGrey")]
+        [String]$PrimaryColor = "Blue",
+
+        [Parameter(ParameterSetName='MaterialDesign')]
+        [ValidateSet("Red","Pink","Purple","DeepPurple","Indigo",
+                      "Blue","LightBlue","Cyan","Teal","Green","LightGreen",
+                      "Lime","Yellow","Amber","Orange","DeepOrange")]
+        [String]$AccentColor = "LightBlue",
+
+        [Parameter(ParameterSetName='MaterialDesign')]
+        [ValidateSet("Large","Medium","Small")]
+        [String]$Size = "Medium",
+
+        [Parameter(ParameterSetName='MaterialDesign')]
+        [ValidateSet("Dark","Light")]
+        [String]$Theme = "Light"
+    )
+
+    if($MaterialDesign)
+    {
+
+        try{
+        
+            Import-Module .\src\MaterialDesignColors.dll -ErrorAction Stop
+            Import-Module .\src\MaterialDesignThemes.Wpf.dll -ErrorAction Stop
+        
+        }
+        catch {
+
+            $MaterialDesign = $false
+            Write-Error "Failed to load Material Design Toolkit DLLs. Verify they are unblocked and in the .\src directory" -ErrorAction Continue
+
+        }
+
+
+    }
+
+    $ProgressSize = @{"Small"=140;"Medium"=280;"Large"=560}
+
     [void][System.Reflection.Assembly]::LoadWithPartialName('presentationframework') 
     $syncHash = [hashtable]::Synchronized(@{})
     $newRunspace =[runspacefactory]::CreateRunspace()
     $syncHash.Runspace = $newRunspace
-    $syncHash.Activity = ''
-    $syncHash.PercentComplete = 0
-    $syncHash.CurrentOperation = ''
-    $syncHash.AdditionalInfo = ''
-    $newRunspace.ApartmentState = "STA" 
-    $newRunspace.ThreadOptions = "ReuseThread"           
-    $data = $newRunspace.Open() | Out-Null
-    $newRunspace.SessionStateProxy.SetVariable("syncHash",$syncHash)           
-    $PowerShellCommand = [PowerShell]::Create().AddScript({    
-        [string]$xaml = @" 
+    $syncHash.SecondsRemainingInput = $Null
+    $syncHash.StatusInput = ''
+    $syncHash.CurrentOperationInput = ''
+    $syncHash.XAML = @" 
         <Window 
             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
             Name="Window" Title="Progress..." WindowStartupLocation = "CenterScreen" 
-            Width = "560" Height="130" SizeToContent="Height" ShowInTaskbar = "True"> 
+            Width = "$($ProgressSize[$Size]+75)" SizeToContent = "Height" ShowInTaskbar = "True"
+            
+            $(if($MaterialDesign){
+            @'
+            TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+'@
+            
+            })
+            
+            >
+            $(
+            
+                if($MaterialDesign)
+                {
+
+                  @"
+                    <Window.Resources>
+                        <ResourceDictionary>
+                            <ResourceDictionary.MergedDictionaries>
+                                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.$Theme.xaml" />
+                                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.$PrimaryColor.xaml" />
+                                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.$AccentColor.xaml" />
+                            </ResourceDictionary.MergedDictionaries>            
+                        </ResourceDictionary>
+                    </Window.Resources>
+"@
+
+                }
+            
+            ) 
             <StackPanel Margin="20">
-               <ProgressBar Width="560" Name="ProgressBar" />
-               <TextBlock Text="{Binding ElementName=ProgressBar, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-               <TextBlock Name="AdditionalInfoTextBlock" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            $(
+
+                if($MaterialDesign)
+                {
+
+                    @"
+                    <ProgressBar $(
+                                    
+                                    switch($Type) {
+                                        
+                                        "Circle" {
+                                        
+                                        @"
+                                        Style="{StaticResource MaterialDesignCircularProgressBar}" Height="$($ProgressSize[$Size]+10)" Width="$($ProgressSize[$Size])"
+"@
+                                        }
+                                        
+                                        "Horizontal" {
+                                        
+                                        @"
+                                        Orientation="Horizontal" Width="$($ProgressSize[$Size])"
+"@
+
+                                        }
+
+                                        "Vertical" {
+                                        
+                                        @"
+                                        Orientation="Vertical" Height="$($ProgressSize[$Size])"
+"@
+
+                                        }
+
+                                    }
+                                    
+                                    ) IsIndeterminate="$($IsIndeterminate)"  Name="ProgressBar" />
+"@
+
+                }
+                else
+                {
+
+                    @"
+                    <ProgressBar IsIndeterminate="$($IsIndeterminate)" Width="560" Name="ProgressBar" />
+"@
+
+                }
+
+            )
+               
+               <TextBlock Name="PercentCompleteTextBlock" StackPanel.ZIndex = "99" Text="{Binding ElementName=ProgressBar, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+               <TextBlock Name="Status" Text="" HorizontalAlignment="Left" />
+               <TextBlock Name="TimeRemaining" Text="" HorizontalAlignment="Left" />
+               <TextBlock Name="CurrentOperation" Text="" HorizontalAlignment="Left" />
             </StackPanel> 
         </Window> 
-"@ 
+"@
+
+    $newRunspace.ApartmentState = "STA" 
+    $newRunspace.ThreadOptions = "ReuseThread"           
+    $data = $newRunspace.Open() | Out-Null
+    $newRunspace.SessionStateProxy.SetVariable("syncHash",$syncHash)
+    
+    
+              
+    $PowerShellCommand = [PowerShell]::Create().AddScript({    
+ 
    
-        $syncHash.Window=[Windows.Markup.XamlReader]::parse( $xaml ) 
+        $syncHash.Window=[Windows.Markup.XamlReader]::parse( $SyncHash.XAML ) 
         #===========================================================================
         # Store Form Objects In PowerShell
         #===========================================================================
-        ([xml]$xaml).SelectNodes("//*[@Name]") | %{ $SyncHash."$($_.Name)" = $SyncHash.Window.FindName($_.Name)}
+        ([xml]$SyncHash.XAML).SelectNodes("//*[@Name]") | %{ $SyncHash."$($_.Name)" = $SyncHash.Window.FindName($_.Name)}
+        $TimeRemaining = [System.TimeSpan]
 
         $updateBlock = {            
             
             $SyncHash.Window.Title = $SyncHash.Activity
             $SyncHash.ProgressBar.Value = $SyncHash.PercentComplete
-            $SyncHash.AdditionalInfoTextBlock.Text = $SyncHash.AdditionalInfo
+            if([string]::IsNullOrEmpty($SyncHash.PercentComplete) -ne $True -and $SyncHash.ProgressBar.IsIndeterminate -eq $True)
+            {
+
+                $SyncHash.ProgressBar.IsIndeterminate = $False
+
+            }
+            $SyncHash.Status.Text = $SyncHash.StatusInput
+            if($SyncHash.SecondsRemainingInput)
+            {
+                $TimeRemaining = [System.TimeSpan]::FromSeconds($SyncHash.SecondsRemainingInput)
+                $SyncHash.TimeRemaining.Text = '{0:00}:{1:00}:{2:00}' -f $TimeRemaining.Hours,$TimeRemaining.Minutes,$TimeRemaining.Seconds
+            }
+            $SyncHash.CurrentOperation.Text = $SyncHash.CurrentOperationInput
             #$SyncHash.Window.MinWidth = $SyncHash.Window.ActualWidth
                        
         }
@@ -124,26 +264,16 @@ function Write-ProgressBar
    if($PercentComplete)
    {
        
-       Write-Verbose -Message "Setting PercentComplete to $PercentComplete"
        $ProgressBar.PercentComplete = $PercentComplete
 
    }
    
-   if($SecondsRemaining)
-   {
 
-       [String]$SecondsRemaining = "$SecondsRemaining Seconds Remaining"
+    $ProgressBar.SecondsRemainingInput = $SecondsRemaining
 
-   }
-   else
-   {
+    $ProgressBar.StatusInput = $Status
 
-       [String]$SecondsRemaining = $Null
-
-   }
-
-   Write-Verbose -Message "Setting AdditionalInfo to $Status       $SecondsRemaining$(if($SecondsRemaining){ " seconds remaining..." }else {''})       $CurrentOperation"
-   $ProgressBar.AdditionalInfo = "$Status       $SecondsRemaining       $CurrentOperation"
+    $ProgressBar.CurrentOperationInput = $CurrentOperation
 
 }
 
@@ -164,25 +294,33 @@ function Close-ProgressBar
 }
 
 
+$Files = dir $env:USERPROFILE -Recurse
 
-$ProgressBar = New-ProgressBar
 
-Write-ProgressBar -ProgressBar $ProgressBar -Activity "Hello" -PercentComplete 50 -CurrentOperation "Counting to 50"
+$ProgressBars = @()
 
-Measure-Command -Expression {
-    $Files = dir $env:USERPROFILE -Recurse
-    $i = 0
-    $Files | foreach {
+$ProgressBars += New-ProgressBar -MaterialDesign -IsIndeterminate $true -Type Circle -PrimaryColor Green -AccentColor DeepPurple -Size Large -Theme Dark
+$ProgressBars += New-ProgressBar -MaterialDesign -Type Horizontal -PrimaryColor Red -AccentColor LightBlue -Size Medium -Theme Light
+$ProgressBars += New-ProgressBar -MaterialDesign -Type Vertical -PrimaryColor Amber -AccentColor DeepOrange -Size Large -Theme Dark
+$ProgressBars += New-ProgressBar -MaterialDesign -Type Circle -PrimaryColor Blue -AccentColor Cyan -Size Small -Theme Light
+
+Start-Sleep -Seconds 2
+
+$i = 0
+foreach ($File in $Files) { 
+                    $i++
+                    Start-Sleep -Milliseconds 2
+                    foreach ($ProgressBar in $ProgressBars) {
     
-                        $i++
-                        Start-Sleep -Milliseconds 10
     
                         Write-ProgressBar `
                                 -ProgressBar $ProgressBar `
                                 -Activity "Viewing Files" `
                                 -PercentComplete (($i/$Files.count) * 100) `
-                                -CurrentOperation $_.FullName `
-                                -Status $_.Name `
-                                -SecondsRemaining (100 - $_.count)
-                     }
-}
+                                -CurrentOperation $File.FullName `
+                                -Status $File.Name `
+                                -SecondsRemaining ($Files.Count - $i)
+
+                    }
+
+                }
