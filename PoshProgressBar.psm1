@@ -1,5 +1,4 @@
-﻿
-
+﻿#.ExternalHelp PoshProgressBar.psm1-help.xml
 Function New-ProgressBar 
 {
  
@@ -27,7 +26,6 @@ Function New-ProgressBar
                       "Lime","Yellow","Amber","Orange","DeepOrange")]
         [String]$AccentColor = "LightBlue",
 
-        [Parameter(ParameterSetName='MaterialDesign')]
         [ValidateSet("Large","Medium","Small")]
         [String]$Size = "Medium",
 
@@ -35,25 +33,6 @@ Function New-ProgressBar
         [ValidateSet("Dark","Light")]
         [String]$Theme = "Light"
     )
-
-    if($MaterialDesign)
-    {
-
-        try{
-        
-            Import-Module .\src\MaterialDesignColors.dll -ErrorAction Stop
-            Import-Module .\src\MaterialDesignThemes.Wpf.dll -ErrorAction Stop
-        
-        }
-        catch {
-
-            $MaterialDesign = $false
-            Write-Error "Failed to load Material Design Toolkit DLLs. Verify they are unblocked and in the .\src directory" -ErrorAction Continue
-
-        }
-
-
-    }
 
     $ProgressSize = @{"Small"=140;"Medium"=280;"Large"=560}
 
@@ -148,7 +127,7 @@ Function New-ProgressBar
                 {
 
                     @"
-                    <ProgressBar IsIndeterminate="$($IsIndeterminate)" Width="560" Name="ProgressBar" />
+                    <ProgressBar IsIndeterminate="$($IsIndeterminate)" Width="$($ProgressSize[$Size])" Name="ProgressBar" />
 "@
 
                 }
@@ -244,6 +223,7 @@ Function New-ProgressBar
 
 }
 
+#.ExternalHelp PoshProgressBar.psm1-help.xml
 function Write-ProgressBar
 {
 
@@ -277,6 +257,7 @@ function Write-ProgressBar
 
 }
 
+#.ExternalHelp PoshProgressBar.psm1-help.xml
 function Close-ProgressBar
 {
 
@@ -285,42 +266,12 @@ function Close-ProgressBar
         [System.Object[]]$ProgressBar
     )
 
-    $ProgressBar.Window.Dispatcher.Invoke([action]{ 
+    $ProgressBar.Window.Dispatcher.InvokeAsync([action]{ 
       
       $ProgressBar.Window.close()
 
     }, "Normal")
- 
+
+    $ProgressBar.Runspace.CloseAsync()
+
 }
-
-
-$Files = dir $env:USERPROFILE -Recurse
-
-
-$ProgressBars = @()
-
-$ProgressBars += New-ProgressBar -MaterialDesign -IsIndeterminate $true -Type Circle -PrimaryColor Green -AccentColor DeepPurple -Size Large -Theme Dark
-$ProgressBars += New-ProgressBar -MaterialDesign -Type Horizontal -PrimaryColor Red -AccentColor LightBlue -Size Medium -Theme Light
-$ProgressBars += New-ProgressBar -MaterialDesign -Type Vertical -PrimaryColor Amber -AccentColor DeepOrange -Size Large -Theme Dark
-$ProgressBars += New-ProgressBar -MaterialDesign -Type Circle -PrimaryColor Blue -AccentColor Cyan -Size Small -Theme Light
-
-Start-Sleep -Seconds 2
-
-$i = 0
-foreach ($File in $Files) { 
-                    $i++
-                    Start-Sleep -Milliseconds 2
-                    foreach ($ProgressBar in $ProgressBars) {
-    
-    
-                        Write-ProgressBar `
-                                -ProgressBar $ProgressBar `
-                                -Activity "Viewing Files" `
-                                -PercentComplete (($i/$Files.count) * 100) `
-                                -CurrentOperation $File.FullName `
-                                -Status $File.Name `
-                                -SecondsRemaining ($Files.Count - $i)
-
-                    }
-
-                }
