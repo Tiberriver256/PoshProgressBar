@@ -1,84 +1,329 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="PoshProgressBar : A PowerShell ProgressBar in XAML using Material Design in XAML Toolkit from ButchersBoy">
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-    
+<head>
     <!--Import Google Icon Font-->
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
-    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css"  media="screen,projection"/>
-    
-    <title>PoshProgressBar</title>
-  </head>
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="/style.css" media="screen,projection" />
 
-  <body>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        img {
+            vertical-align: bottom;
+            display: inline-block;
+        }
+    </style>
+</head>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/Tiberriver256/PoshProgressBar">View on GitHub</a>
+<body>
 
-          <h1 id="project_title">PoshProgressBar</h1>
-          <h2 id="project_tagline">A PowerShell ProgressBar in XAML using Material Design in XAML Toolkit from ButchersBoy</h2>
+    <div class="container">
+        <nav class="blue darken-3">
+            <div class="nav-wrapper">
+                <a href="#" class="brand-logo center">PoshProgressBar</a>
+            </div>
+        </nav>
+        <div id="main" class="card-panel">
+            <div class="row">
+                <div class="col s12">
+                    <h5 class="center-align">A PowerShell ProgressBar in XAML using Material Design in XAML Toolkit from ButchersBoy</h5>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="container">
+                <div class="section">
+                    <h5>Installation Methods</h5>
+                    <ul class="collection">
+                        <a href="https://github.com/Tiberriver256/PoshProgressBar/tree/master/PoshProgressBar">
+                            <li class="collection-item black blue-text lighten-5-text" style="background: url('http://tiberriver256.github.io/PoshProgressBar/images/blacktocat.png') no-repeat 95% 50%;">
+                                Download from Github
+                            </li>
+                        </a>
+                        <a href="https://www.powershellgallery.com/packages/PoshProgressBar/">
+                            <li class="collection-item blue darken-3 white-text">
+                                PowerShell Gallery
+                            </li>
+                        </a>
+                    </ul>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="section">
+                <div class="card-panel">
+                    <h5 class="center-align">Preview</h5>
+                    <div>
+                        <p class="center-align">Use this form to quickly try out different styles for your progressbar</p>
+                    </div>
+                </div>
+                <form action="#" method="post">
+                    <div class="row">
+                        <div class="input-field col s6">
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/Tiberriver256/PoshProgressBar/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/Tiberriver256/PoshProgressBar/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
+                            <h6>Material Design?</h6>
+
+                            <input name="materialDesign" id="element_1_1" type="radio" value="Yes">
+                            <label for="element_1_1">Yes</label>
+
+                            <input name="materialDesign" id="element_1_2" type="radio" value="No">
+                            <label for="element_1_2">No (Default)</label>
+
+                        </div>
+                        <div class="input-field col s6">
+
+                            <h6>Determinate or indeterminate?</h6>
+
+                            <input name="indeterminate" id="element_2_1" type="radio" value="$False">
+                            <label for="element_2_1">$False</label>
+
+                            <input name="indeterminate" id="element_2_2" type="radio" value="$True">
+                            <label class="choice" for="element_2_2">$True (Default)</label>
+
+                            <br />
+                            <br />
+
+                            <p>
+                                <i>
+                                    *The progressbar will automatically switch to determinate if you send a percentcomplete from your write-progressbar cmdlet
+                                    </i>
+                            </p>
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <h6>ProgressBar Type (Style)?</h6>
+
+                            <input name="type" id="element_3_1" type="radio" value="Circle" disabled>
+                            <label class="choice" for="element_3_1">Circle</label>
+
+                            <input name="type" id="element_3_2" type="radio" value="Horizontal">
+                            <label class="choice" for="element_3_2">Horizontal (Default)</label>
+
+                            <input name="type" id="element_3_3" type="radio" value="Vertical" disabled>
+                            <label class="choice" for="element_3_3">Vertical</label>
+
+                        </div>
+                        <div class="row col s6">
+                            <div class="input-field">
+                                <select name="PrimaryColor" id="element_4" disabled>
+                                    <option value=""></option>
+                                    <option value="Red">Red</option>
+                                    <option value="Pink">Pink</option>
+                                    <option value="Purple">Purple</option>
+                                    <option value="DeepPurple">DeepPurple</option>
+                                    <option value="Indigo">Indigo</option>
+                                    <option value="Blue">Blue (Default)</option>
+                                    <option value="LightBlue">LightBlue</option>
+                                    <option value="Cyan">Cyan</option>
+                                    <option value="Teal">Teal</option>
+                                    <option value="Green">Green</option>
+                                    <option value="LightGreen">LightGreen</option>
+                                    <option value="Lime">Lime</option>
+                                    <option value="Yellow">Yellow</option>
+                                    <option value="Amber">Amber</option>
+                                    <option value="Orange">Orange</option>
+                                    <option value="DeepOrange">DeepOrange</option>
+                                    <option value="Brown">Brown</option>
+                                    <option value="Grey">Grey</option>
+                                    <option value="BlueGrey">BlueGrey</option>
+
+                                </select>
+                                <label for="element_4">Primary Color</label>
+                            </div>
+                            <div class="input-field">
+                                <select name="AccentColor" id="element_5" disabled>
+                                    <option value=""></option>
+                                    <option value="Red">Red</option>
+                                    <option value="Pink">Pink</option>
+                                    <option value="Purple">Purple</option>
+                                    <option value="DeepPurple">DeepPurple</option>
+                                    <option value="Indigo">Indigo</option>
+                                    <option value="Blue">Blue</option>
+                                    <option value="LightBlue">LightBlue (Default)</option>
+                                    <option value="Cyan">Cyan</option>
+                                    <option value="Teal">Teal</option>
+                                    <option value="Green">Green</option>
+                                    <option value="LightGreen">LightGreen</option>
+                                    <option value="Lime">Lime</option>
+                                    <option value="Yellow">Yellow</option>
+                                    <option value="Amber">Amber</option>
+                                    <option value="Orange">Orange</option>
+                                    <option value="DeepOrange">DeepOrange</option>
+                                </select>
+                                <label for="element_5">Accent Color </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s6">
+
+                            <h6>Size</h6>
+
+                            <input name="Size" id="element_6_1" type="radio" value="Small">
+                            <label class="choice" for="element_6_1">Small</label>
+
+                            <input name="Size" id="element_6_2" type="radio" value="Medium">
+                            <label class="choice" for="element_6_2">Medium (Default)</label>
+
+                            <input name="Size" id="element_6_3" type="radio" value="Large">
+                            <label class="choice" for="element_6_3">Large</label>
+
+                        </div>
+
+                        <div class="input-field col s6">
+
+                            <h6>Theme</h6>
+
+                            <input name="Theme" id="element_7_1" type="radio" value="Dark" disabled>
+                            <label class="choice" for="element_7_1">Dark</label>
+
+                            <input name="Theme" id="element_7_2" type="radio" value="Light" disabled>
+                            <label class="choice" for="element_7_2">Light (Default)</label>
+
+                        </div>
+                    </div>
+
+                    <br />
+                    <br />
+
+                    <pre>
+                        <code class="ps" id="resultCode"></code>
+                    </pre>
+
+                    <div class="input-field col s12">
+                        <a class="btn center">Generate Preview</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>
-<a id="poshprogressbar" class="anchor" href="#poshprogressbar" aria-hidden="true"><span class="octicon octicon-link"></span></a>PoshProgressBar</h3>
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+    <script type="text/javascript" src="/powershell.js"></script>
 
-<p>This is a project intended to make it easy to add beautiful GUI based Progressbars to any PowerShell script or project</p>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
 
-<h3>
-<a id="installation-methods" class="anchor" href="#installation-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation Methods</h3>
+    <script>
+        $(document).ready(function () {
+            $('select').material_select();
+        });
 
-<ol>
-<li>
-<a href="https://github.com/Tiberriver256/PoshProgressBar/tree/master/PoshProgressBar">Download</a> and install the module</li>
-<li>Install from the PowerShell Gallery with the following code:</li>
-</ol>
+        // Disabling elements that are unavailable when not using material design styles
 
-<p><code>Install-Module -Name PoshProgressBar</code></p>
+        $("#element_1_2").change(function () {
 
-<h3>
-<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h3>
-      </section>
-    </div>
+            $("#element_3_1").attr("disabled", "disabled");
+            $("input[name='type']:checked").attr("checked", false)
+            $("#element_3_3").attr("disabled", "disabled");
+            $("#element_4").attr("disabled", "disabled");
+            $("#element_5").attr("disabled", "disabled");
+            $("#element_7_1").attr("disabled", "disabled");
+            $("#element_7_2").attr("disabled", "disabled");
+            $("input[name='Theme']:checked").attr("checked", false)
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">PoshProgressBar maintained by <a href="https://github.com/Tiberriver256">Tiberriver256</a></p>
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
+            $(document).ready(function () {
+                $('select').material_select();
+            });
 
-              <script type="text/javascript">
-            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-          </script>
-          <script type="text/javascript">
-            try {
-              var pageTracker = _gat._getTracker("UA-70751453-2");
-            pageTracker._trackPageview();
-            } catch(err) {}
-          </script>
+        });
 
-          <!--Import jQuery before materialize.js-->
-          <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-          <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
+        // Enabling elements that are available when using material design styles
 
-  </body>
+        $("#element_1_1").change(function () {
+
+            $("#element_4").removeAttr("disabled");
+            $("#element_5").removeAttr("disabled");
+            $("#element_3_1").removeAttr("disabled");
+            $("#element_3_3").removeAttr("disabled");
+            $("#element_7_1").removeAttr("disabled");
+            $("#element_7_2").removeAttr("disabled");
+
+            $(document).ready(function () {
+                $('select').material_select();
+            });
+
+        });
+
+        // Update PowerShell code block when any input is changed
+
+        $('input').change(function () {
+            updateCode();
+        })
+
+        // Update PowerShell code block when any select is changed
+
+        $('select').change(function () {
+            updateCode();
+        })
+
+        function updateCode() {
+            var resultCode = "New-ProgressBar "
+
+            var indeterminate = $("input[name='element_2']:checked").val()
+            var type = $("input[name='element_3']:checked").val()
+
+
+            switch ($("input[name='materialDesign']:checked").val()) {
+            case "Yes":
+                resultCode = resultCode + "-MaterialDesign ";
+                // alert(resultCode);
+                break;
+            case "No":
+                // alert(resultCode);
+                break;
+            default:
+                // alert(materialDesign);
+            }
+
+            var indeterminate = $("input[name='indeterminate']:checked").val()
+
+            if (indeterminate) {
+                resultCode = resultCode + "-Indeterminate " + indeterminate + " ";
+            }
+
+            var type = $("input[name='type']:checked").val()
+
+            if (type) {
+                resultCode = resultCode + "-Type " + type + " ";
+            }
+
+            if (!$("#element_4").attr("disabled") && $("#element_4").val() != "") {
+                resultCode = resultCode + "-PrimaryColor " + $("#element_4").val() + " ";
+            }
+
+            if (!$("#element_5").attr("disabled") && $("#element_5").val() != "") {
+                resultCode = resultCode + "-AccentColor " + $("#element_5").val() + " ";
+            }
+
+            var size = $("input[name='Size']:checked").val()
+
+            if (size) {
+                resultCode = resultCode + "-Size " + size + " ";
+            }
+
+            var theme = $("input[name='Theme']:checked").val()
+
+            if (theme) {
+                resultCode = resultCode + "-Theme " + theme + " ";
+            }
+
+
+            $('#resultCode').text(resultCode);
+            hljs.initHighlighting.called = false;
+            hljs.initHighlighting();
+
+        }
+    </script>
+</body>
+
 </html>
