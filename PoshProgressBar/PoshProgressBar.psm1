@@ -3,10 +3,12 @@ Function New-ProgressBar
 {
  
     param(
-        
+        [Parameter(ParameterSetName = "Standard")]
+        [Parameter(ParameterSetName='MaterialDesign')]
+        [ValidateSet($True,$False)]
         [Bool]$IsIndeterminate = $True,
 
-        [Parameter(ParameterSetName='MaterialDesign')]
+        [Parameter(Position = 0, Mandatory = $True, ParameterSetName='MaterialDesign')]
         [switch]$MaterialDesign,
         
         [Parameter(ParameterSetName='MaterialDesign')]
@@ -26,6 +28,8 @@ Function New-ProgressBar
                       "Lime","Yellow","Amber","Orange","DeepOrange")]
         [String]$AccentColor = "LightBlue",
 
+        [Parameter(ParameterSetName = "Standard")]
+        [Parameter(ParameterSetName='MaterialDesign')]
         [ValidateSet("Large","Medium","Small")]
         [String]$Size = "Medium",
 
