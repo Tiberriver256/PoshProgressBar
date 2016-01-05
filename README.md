@@ -6,6 +6,7 @@ A PowerShell ProgressBar in XAML using Material Design in XAML Toolkit from Butc
 #TODO
 
 1. Automated Screenshots for documentation
-2. Closing progressbar shrinks it to notification tray
-3. Branding (.ico, Banner, Background)
-4. Add MahApps styling
+2. Backwards compatibility and ??Server 2012 Compatibility??
+3. Closing progressbar shrinks it to notification tray
+4. Branding (.ico, Banner, Background)
+5. Add MahApps styling
