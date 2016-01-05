@@ -32,6 +32,10 @@
                     <h5 class="center-align">A PowerShell ProgressBar in XAML using Material Design in XAML Toolkit from ButchersBoy</h5>
                     <br />
                     <h5 class="center-align"><a href="http://tiberriver256.github.io/powershell/PowerShellProgress-Pt1/">Read the four part blog series</a></h5>
+                    <br />
+                    <video class="center-align responsive-video" autoplay loop>
+                        <source src="videos/Demo.mp4" type="video/mp4"> Your browser does not support HTML5 video.
+                    </video>
                 </div>
             </div>
             <div class="divider"></div>
@@ -336,23 +340,29 @@
             if (theme) {
                 resultCode = resultCode + "-Theme " + theme + " ";
             }
-            
+
             $('#resultCode').text(resultCode);
             hljs.initHighlighting.called = false;
             hljs.initHighlighting();
 
         }
     </script>
-    
+
     <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
         ga('create', 'UA-70751453-2', 'auto');
         ga('send', 'pageview');
-
     </script>
 </body>
 
