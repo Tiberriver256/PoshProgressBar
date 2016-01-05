@@ -57,11 +57,11 @@
                 <br />
                 <h5>Step 1: Create your progress bar</h5>
                 <pre>
-                    <code class="ps" id="resultCode">$ProgressBar = New-ProgressBar</code>
+                    <code class="ps">$ProgressBar = New-ProgressBar</code>
                 </pre>
                 <h5>Step 2: Write your progress</h5>
                 <pre>
-                    <code class="ps" id="resultCode">Write-ProgressBar -ProgressBar $Progressbar `
+                    <code class="ps">Write-ProgressBar -ProgressBar $Progressbar `
                         -Activity "Prettyin up Powershell" `
                         -PercentComplete 50 `
                         -Status "Prettyin" `
@@ -71,7 +71,7 @@
                 </pre>
                 <h5>Step 3: Gracefully close out that beautiful progressbar</h5>
                 <pre>
-                    <code class="ps" id="resultCode">$ProgressBar = New-ProgressBar</code>
+                    <code class="ps">$ProgressBar = New-ProgressBar</code>
                 </pre>
                 <h5>Next Steps: Style it up!</h5>
             </div>
@@ -334,8 +334,6 @@
             if (theme) {
                 resultCode = resultCode + "-Theme " + theme + " ";
             }
-
-            alert(resultCode);
             
             $('#resultCode').text(resultCode);
             hljs.initHighlighting.called = false;

@@ -48,7 +48,7 @@
 .hljs-regexp,
 .hljs-literal,
 .hljs-link {
-    color: #0f0
+    color: #FBE4BB
 }
 
 .hljs-variable {
@@ -78,8 +78,3 @@
 .hljs-params { 
     Color: #A9A9A9 
 }
-
- .language-powershell .s2 .s1 { Color: #8B0000 } 
- .language-powershell .nb { Color: #0000FF } 
- .language-powershell .no { Color: #008080 } 
- .language-powershell .p .o { Color: #A9A9A9 }
