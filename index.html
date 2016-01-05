@@ -38,7 +38,7 @@
                     <h5>Installation Methods</h5>
                     <ul class="collection">
                         <a href="https://github.com/Tiberriver256/PoshProgressBar/tree/master/PoshProgressBar">
-                            <li class="collection-item black blue-text lighten-5-text" style="background: url('http://tiberriver256.github.io/PoshProgressBar/images/blacktocat.png') no-repeat 95% 50%;">
+                            <li class="collection-item black blue-text lighten-5-text" style="background: url('images/blacktocat.png') no-repeat 95% 50%;">
                                 Download from Github
                             </li>
                         </a>
@@ -52,11 +52,33 @@
             </div>
             <div class="divider"></div>
             <div class="section">
+                <h5>Usage</h5>
+                <br />
+                <br />
+                <h5>Step 1: Create your progress bar</h5>
+                <pre>
+                    <code class="ps" id="resultCode">$ProgressBar = New-ProgressBar</code>
+                </pre>
+                <h5>Step 2: Write your progress</h5>
+                <pre>
+                    <code class="ps" id="resultCode">Write-ProgressBar -ProgressBar $Progressbar `
+                        -Activity "Prettyin up Powershell" `
+                        -PercentComplete 50 `
+                        -Status "Prettyin" `
+                        -SecondsRemaining 100 `
+                        -CurrentOperation "Progressifyin"
+                    </code>
+                </pre>
+                <h5>Step 3: Gracefully close out that beautiful progressbar</h5>
+                <pre>
+                    <code class="ps" id="resultCode">$ProgressBar = New-ProgressBar</code>
+                </pre>
+                <h5>Next Steps: Style it up!</h5>
+            </div>
+            <div class="divider"></div>
+            <div class="section">
                 <div class="card-panel">
-                    <h5 class="center-align">Preview</h5>
-                    <div>
-                        <p class="center-align">Use this form to quickly try out different styles for your progressbar</p>
-                    </div>
+                    <h5 class="center-align">ProgressBar Builder</h5>
                 </div>
                 <form action="#" method="post">
                     <div class="row">
@@ -191,12 +213,8 @@
                     <br />
 
                     <pre>
-                        <code class="ps" id="resultCode"></code>
+                        <code class="ps" id="resultCode">New-ProgressBar</code>
                     </pre>
-
-                    <div class="input-field col s12">
-                        <a class="btn center">Generate Preview</a>
-                    </div>
 
                 </form>
             </div>
@@ -317,7 +335,8 @@
                 resultCode = resultCode + "-Theme " + theme + " ";
             }
 
-
+            alert(resultCode);
+            
             $('#resultCode').text(resultCode);
             hljs.initHighlighting.called = false;
             hljs.initHighlighting();
