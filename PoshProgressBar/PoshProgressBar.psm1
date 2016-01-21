@@ -4,9 +4,11 @@ Function New-ProgressBar
  
     param(
         
+        [Parameter(ParameterSetName='Standard')]
+        [Parameter(ParameterSetName='MaterialDesign')]
         [Bool]$IsIndeterminate = $True,
 
-        [Parameter(ParameterSetName='MaterialDesign')]
+        [Parameter(ParameterSetName='MaterialDesign', Mandatory=$true)]
         [switch]$MaterialDesign,
         
         [Parameter(ParameterSetName='MaterialDesign')]
@@ -26,6 +28,8 @@ Function New-ProgressBar
                       "Lime","Yellow","Amber","Orange","DeepOrange")]
         [String]$AccentColor = "LightBlue",
 
+        [Parameter(ParameterSetName='Standard')]
+        [Parameter(ParameterSetName='MaterialDesign')]
         [ValidateSet("Large","Medium","Small")]
         [String]$Size = "Medium",
 
@@ -275,3 +279,4 @@ function Close-ProgressBar
     $ProgressBar.Runspace.CloseAsync()
 
 }
+
