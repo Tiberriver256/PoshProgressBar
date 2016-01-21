@@ -20,5 +20,5 @@ Nothing too formal.
 2. Assign it to yourself
 3. Fork it
 4. Code it
-5. Submit the pull request
-6. I'll verify with testing everything looks good and then merge it, and add it to the PowerShell Gallery
+5. Submit the pull request to the **Development** branch.
+6. I'll verify with testing everything looks good and then merge it with the master, and add it to the PowerShell Gallery
