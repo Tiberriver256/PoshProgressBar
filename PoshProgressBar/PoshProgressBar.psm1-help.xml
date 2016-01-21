@@ -241,6 +241,8 @@ $ProgressBars += New-ProgressBar -MaterialDesign -Type Circle -PrimaryColor Blue
 
 Start-Sleep -Seconds 2
 
+$Files = Dir
+
 $i = 0
 foreach ($File in $Files) { 
                     $i++
