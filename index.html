@@ -37,34 +37,33 @@
                     <div id="progressDemoPlaceholder"></div>
                 </div>
             </div>
-            <div class="divider"></div>
-            <div class="container">
-                <div class="section">
-                    <h5>Installation Methods</h5>
-                    <ul class="collection">
-                        <a href="https://github.com/Tiberriver256/PoshProgressBar/tree/master/PoshProgressBar">
-                            <li class="collection-item black blue-text lighten-5-text" style="background: url('images/blacktocat.png') no-repeat 95% 50%;">
-                                Download from Github
-                            </li>
-                        </a>
-                        <a href="https://www.powershellgallery.com/packages/PoshProgressBar/">
-                            <li class="collection-item blue darken-3 white-text">
-                                PowerShell Gallery
-                            </li>
-                        </a>
-                    </ul>
-                </div>
+            <div class="section">
+
             </div>
-            <div class="divider"></div>
             <div class="section">
                 <h5>Usage</h5>
                 <br />
                 <br />
-                <h5>Step 1: Create your progress bar</h5>
+                <h5>Step 1: Installation</h5>
+                <ul class="collection">
+                    <a href="https://github.com/Tiberriver256/PoshProgressBar/tree/master/PoshProgressBar">
+                        <li class="collection-item black blue-text lighten-5-text" style="background: url('images/blacktocat.png') no-repeat 95% 50%;">
+                            Download from Github -- Gimme the code
+                        </li>
+                    </a>
+                    <a href="https://www.powershellgallery.com/packages/PoshProgressBar/" style="background: url('images/packageDefaultIcon.png') no-repeat 95% 50%;">
+                        <li class="collection-item blue darken-3 white-text">
+                            PowerShell Gallery -- Easy mode
+                        </li>
+                    </a>
+                </ul>
+                <br />
+                <br />
+                <h5>Step 2: Create your progress bar</h5>
                 <pre>
                     <code class="ps">$ProgressBar = New-ProgressBar</code>
                 </pre>
-                <h5>Step 2: Write your progress</h5>
+                <h5>Step 3: Write your progress</h5>
                 <pre>
                     <code class="ps">Write-ProgressBar -ProgressBar $Progressbar `
                         -Activity "Prettyin up Powershell" `
@@ -74,7 +73,7 @@
                         -CurrentOperation "Progressifyin"
                     </code>
                 </pre>
-                <h5>Step 3: Gracefully close out that beautiful progressbar</h5>
+                <h5>Step 4: Gracefully close out that beautiful progressbar</h5>
                 <pre>
                     <code class="ps">Close-ProgressBar $ProgressBar</code>
                 </pre>
