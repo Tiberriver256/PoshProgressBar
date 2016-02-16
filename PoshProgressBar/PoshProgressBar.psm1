@@ -181,7 +181,7 @@ Function New-ProgressBar
             }
             $SyncHash.CurrentOperation.Text = $SyncHash.CurrentOperationInput
             
-            $notifyicon.text = "Activity: $($SyncHash.Activity)`nPercent Complete: $($SyncHash.PercentComplete)"
+            $SyncHash.NotifyIcon.text = "Activity: $($SyncHash.Activity)`nPercent Complete: $($SyncHash.PercentComplete)"
                        
         }
 
@@ -210,26 +210,27 @@ Function New-ProgressBar
 
 
         # Create notifyicon, and right-click -> Exit menu
-        $notifyicon = New-Object System.Windows.Forms.NotifyIcon
-        $notifyicon.Text = "Disk Usage"
-        $notifyicon.Icon = $icon
-        $notifyicon.Visible = $true
+        $SyncHash.NotifyIcon = New-Object System.Windows.Forms.NotifyIcon
+        $SyncHash.NotifyIcon.Text = "Activity: $($SyncHash.Activity)`nPercent Complete: $($SyncHash.PercentComplete)"
+        $SyncHash.NotifyIcon.Icon = $icon
+        $SyncHash.NotifyIcon.Visible = $true
 
         $menuitem = New-Object System.Windows.Forms.MenuItem
         $menuitem.Text = "Exit"
 
         $contextmenu = New-Object System.Windows.Forms.ContextMenu
-        $notifyicon.ContextMenu = $contextmenu
-        $notifyicon.contextMenu.MenuItems.AddRange($menuitem)
+        $SyncHash.NotifyIcon.ContextMenu = $contextmenu
+        $SyncHash.NotifyIcon.contextMenu.MenuItems.AddRange($menuitem)
 
-        $notifyicon.add_DoubleClick({$synchash.window.Show()})
+        $SyncHash.NotifyIcon.add_DoubleClick({$synchash.window.Show()})
 
 
         # When Exit is clicked, close everything and kill the PowerShell process
         $menuitem.add_Click({
-	        $notifyicon.Visible = $false
+	        $SyncHash.NotifyIcon.Visible = $false
             $syncHash.Closing = $True
             $syncHash.Window.Close()
+            [System.Windows.Forms.Application]::Exit()
 
          })
 
@@ -237,12 +238,15 @@ Function New-ProgressBar
          
             if($SyncHash.Closing -eq $True)
             {
-            
+                
             }
             else
             {
                 
                 $SyncHash.Window.Hide()
+                $SyncHash.NotifyIcon.BalloonTipTitle = "Your script is still running..."
+                $SyncHash.NotifyIcon.BalloonTipText = "Double click to open the progress bar again."
+                $SyncHash.NotifyIcon.ShowBalloonTip(100)
                 $_.Cancel = $true
 
             }
@@ -321,8 +325,10 @@ function Close-ProgressBar
     )
 
     $ProgressBar.Window.Dispatcher.InvokeAsync([action]{ 
-      
+      $ProgressBar.Closing = $True
+      $ProgressBar.Window.hide()
       $ProgressBar.Window.close()
+      [System.Windows.Forms.Application]::Exit()
 
     }, "Normal")
 
