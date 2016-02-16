@@ -180,7 +180,8 @@ Function New-ProgressBar
                 $SyncHash.TimeRemaining.Text = '{0:00}:{1:00}:{2:00}' -f $TimeRemaining.Hours,$TimeRemaining.Minutes,$TimeRemaining.Seconds
             }
             $SyncHash.CurrentOperation.Text = $SyncHash.CurrentOperationInput
-            #$SyncHash.Window.MinWidth = $SyncHash.Window.ActualWidth
+            
+            $notifyicon.text = "Activity: $($SyncHash.Activity)`nPercent Complete: $($SyncHash.PercentComplete)"
                        
         }
 
@@ -203,7 +204,56 @@ Function New-ProgressBar
             }            
         } )
 
-        $syncHash.Window.ShowDialog() | Out-Null 
+
+        # Extract icon from PowerShell to use as the NotifyIcon
+        $icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$pshome\powershell.exe")
+
+
+        # Create notifyicon, and right-click -> Exit menu
+        $notifyicon = New-Object System.Windows.Forms.NotifyIcon
+        $notifyicon.Text = "Disk Usage"
+        $notifyicon.Icon = $icon
+        $notifyicon.Visible = $true
+
+        $menuitem = New-Object System.Windows.Forms.MenuItem
+        $menuitem.Text = "Exit"
+
+        $contextmenu = New-Object System.Windows.Forms.ContextMenu
+        $notifyicon.ContextMenu = $contextmenu
+        $notifyicon.contextMenu.MenuItems.AddRange($menuitem)
+
+        $notifyicon.add_DoubleClick({$synchash.window.Show()})
+
+
+        # When Exit is clicked, close everything and kill the PowerShell process
+        $menuitem.add_Click({
+	        $notifyicon.Visible = $false
+            $syncHash.Closing = $True
+            $syncHash.Window.Close()
+
+         })
+
+         $Synchash.window.Add_Closing({
+         
+            if($SyncHash.Closing -eq $True)
+            {
+            
+            }
+            else
+            {
+                
+                $SyncHash.Window.Hide()
+                $_.Cancel = $true
+
+            }
+         
+         })
+
+
+        
+        $syncHash.Window.Show() | Out-Null
+        $appContext = [System.Windows.Forms.ApplicationContext]::new()
+        [void][System.Windows.Forms.Application]::Run($appContext) 
         $syncHash.Error = $Error 
 
     }) 
