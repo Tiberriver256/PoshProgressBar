@@ -6,6 +6,10 @@ Function New-ProgressBar
         
         [Parameter(ParameterSetName='Standard')]
         [Parameter(ParameterSetName='MaterialDesign')]
+        [String]$IconPath,
+        
+        [Parameter(ParameterSetName='Standard')]
+        [Parameter(ParameterSetName='MaterialDesign')]
         [Bool]$IsIndeterminate = $True,
 
         [Parameter(ParameterSetName='MaterialDesign', Mandatory=$true)]
@@ -44,9 +48,11 @@ Function New-ProgressBar
     $syncHash = [hashtable]::Synchronized(@{})
     $newRunspace =[runspacefactory]::CreateRunspace()
     $syncHash.Runspace = $newRunspace
+    $syncHash.Closing = $False
     $syncHash.SecondsRemainingInput = $Null
     $syncHash.StatusInput = ''
     $syncHash.CurrentOperationInput = ''
+    $syncHash.IconPath = $IconPath
     $syncHash.XAML = @" 
         <Window 
             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
@@ -64,6 +70,16 @@ Function New-ProgressBar
 '@
             
             })
+
+            $(
+            if($SyncHash.IconPath){
+                
+                @"
+                Icon="$($SyncHash.IconPath)"
+"@
+
+}
+            )
             
             >
             $(
@@ -165,6 +181,17 @@ Function New-ProgressBar
 
         $updateBlock = {            
             
+            
+            if($SyncHash.Closing -eq $True)
+            {
+
+                $SyncHash.NotifyIcon.Visible = $false
+                $syncHash.Window.Close()
+                [System.Windows.Forms.Application]::Exit()
+                Break
+            }
+            
+            
             $SyncHash.Window.Title = $SyncHash.Activity
             $SyncHash.ProgressBar.Value = $SyncHash.PercentComplete
             if([string]::IsNullOrEmpty($SyncHash.PercentComplete) -ne $True -and $SyncHash.ProgressBar.IsIndeterminate -eq $True)
@@ -206,8 +233,20 @@ Function New-ProgressBar
 
 
         # Extract icon from PowerShell to use as the NotifyIcon
-        $icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$pshome\powershell.exe")
 
+        if($syncHash.IconPath)
+        {
+
+            $icon = [System.Drawing.Icon]::new($syncHash.IconPath)
+            $syncHash.Window.Icon = $Icon
+
+        }
+        else
+        {
+        
+            $icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$pshome\powershell.exe")
+        
+        }
 
         # Create notifyicon, and right-click -> Exit menu
         $SyncHash.NotifyIcon = New-Object System.Windows.Forms.NotifyIcon
@@ -296,6 +335,8 @@ function Write-ProgressBar
         [String]$CurrentOperation = $Null
     ) 
    
+   if($ProgressBar.Closing -eq $true) {exit}
+
    Write-Verbose -Message "Setting activity to $Activity"
    $ProgressBar.Activity = $Activity
 
@@ -321,18 +362,9 @@ function Close-ProgressBar
 
     Param (
         [Parameter(Mandatory=$true)]
-        [System.Object[]]$ProgressBar
+        $ProgressBar
     )
 
-    $ProgressBar.Window.Dispatcher.InvokeAsync([action]{ 
-      $ProgressBar.Closing = $True
-      $ProgressBar.Window.hide()
-      $ProgressBar.Window.close()
-      [System.Windows.Forms.Application]::Exit()
-
-    }, "Normal")
-
-    $ProgressBar.Runspace.CloseAsync()
+    $ProgressBar.Closing = $True
 
 }
-

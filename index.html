@@ -19,7 +19,7 @@
     </style>
 </head>
 
-<body>
+<body>   			
 
     <div class="container">
         <nav class="blue darken-3">
@@ -32,7 +32,23 @@
                 <div class="col s12">
                     <h5 class="center-align">A PowerShell ProgressBar in XAML using Material Design in XAML Toolkit from ButchersBoy</h5>
                     <br />
-                    <h5 class="center-align"><a href="http://tiberriver256.github.io/powershell/PowerShellProgress-Pt1/">Read the four part blog series</a></h5>
+                    <div class="card col s6">
+                        <div class="card-content">
+                            <span class="card-title activator grey-text text-darken-4">Current Version: 0.12<i class="material-icons right">more_vert</i></span>
+                        </div>
+                        <div class="card-reveal">
+                            <span class="card-title grey-text text-darken-4">Release History<i class="material-icons right">close</i></span>
+                            <p>0.11 - Original public release</p>
+                            <p>0.12 - Added icon in notification tray</p>
+                        </div>
+                    </div>
+                    <div class="card col s6">
+                        <div class="card-content">
+                            <span class="card-title activator grey-text text-darken-4">
+                                <a href="http://tiberriver256.github.io/powershell/PowerShellProgress-Pt1/">Read the blog series</a>
+                            </span>
+                        </div>
+                    </div>
                     <br />
                     <div id="progressDemoPlaceholder"></div>
                 </div>
@@ -208,6 +224,15 @@
                             <label class="choice" for="element_7_2">Light (Default)</label>
 
                         </div>
+                        
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s6">
+
+                            <input placeholder="Full path to ico" name="IconPath" id="element_8_1" type="text" >
+                            <label for="element_8_1">IconPath</label>
+
+                        </div>
                     </div>
 
                     <br />
@@ -309,6 +334,12 @@
             if (indeterminate) {
                 resultCode = resultCode + "-IsIndeterminate " + indeterminate + " ";
             }
+            
+            var iconPath = $("input[name='IconPath']").val()
+
+            if (iconPath) {
+                resultCode = resultCode + "-IconPath " + iconPath + " ";
+            }
 
             var type = $("input[name='type']:checked").val()
 
@@ -361,6 +392,7 @@
         ga('create', 'UA-70751453-2', 'auto');
         ga('send', 'pageview');
     </script>
+
 </body>
 
 </html>
