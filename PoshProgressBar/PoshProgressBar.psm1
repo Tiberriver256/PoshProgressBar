@@ -224,7 +224,7 @@ Function New-ProgressBar
             ## Now start the timer running            
             $timer.Start()            
             if( $timer.IsEnabled ) {            
-               Write-Host "Clock is running. Don't forget: RIGHT-CLICK to close it."            
+                           
             } else {            
                $clock.Close()            
                Write-Error "Timer didn't start"            
