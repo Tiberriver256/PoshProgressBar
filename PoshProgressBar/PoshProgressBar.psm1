@@ -138,7 +138,7 @@ Function New-ProgressBar
 
             )
                
-               <TextBlock Name="PercentCompleteTextBlock" StackPanel.ZIndex = "99" Text="{Binding ElementName=ProgressBar, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+               <TextBlock Name="PercentCompleteTextBlock" Visibility="Hidden" StackPanel.ZIndex = "99" Text="{Binding ElementName=ProgressBar, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                <TextBlock Name="Status" Text="" HorizontalAlignment="Left" />
                <TextBlock Name="TimeRemaining" Text="" HorizontalAlignment="Left" />
                <TextBlock Name="CurrentOperation" Text="" HorizontalAlignment="Left" />
@@ -164,7 +164,12 @@ Function New-ProgressBar
         $TimeRemaining = [System.TimeSpan]
 
         $updateBlock = {            
-            
+            if($SyncHash.ProgressBar.IsIndeterminate){
+                $SyncHash.PercentCompleteTextBlock.Visibility = [System.Windows.Visibility]::Hidden
+            } else {
+                $SyncHash.PercentCompleteTextBlock.Visibility = [System.Windows.Visibility]::Visible
+            }
+
             $SyncHash.Window.Title = $SyncHash.Activity
             $SyncHash.ProgressBar.Value = $SyncHash.PercentComplete
             if([string]::IsNullOrEmpty($SyncHash.PercentComplete) -ne $True -and $SyncHash.ProgressBar.IsIndeterminate -eq $True)
