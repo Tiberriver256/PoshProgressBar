@@ -281,6 +281,6 @@ function Close-ProgressBar
 
     }, "Normal")
 
-    $ProgressBar.Runspace.CloseAsync()
+    $ProgressBar.Runspace.CloseAsync() | Out-Null
 
 }
