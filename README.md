@@ -1,3 +1,4 @@
+[![Board Status](https://tiberriver256.visualstudio.com/be77c668-1e13-4360-aa08-264b1d5f64c6/37c8e3a8-220a-47b9-8b2f-13dd17f11c6d/_apis/work/boardbadge/dc0051f8-bff5-4b7d-93ff-2a4b573f1dcf)](https://tiberriver256.visualstudio.com/be77c668-1e13-4360-aa08-264b1d5f64c6/_boards/board/t/37c8e3a8-220a-47b9-8b2f-13dd17f11c6d/Microsoft.RequirementCategory)
 # PoshProgressBar
 A PowerShell ProgressBar in XAML using Material Design in XAML Toolkit from ButchersBoy
 
