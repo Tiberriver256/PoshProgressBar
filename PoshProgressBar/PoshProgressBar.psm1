@@ -1,52 +1,58 @@
 ﻿#.ExternalHelp PoshProgressBar.psm1-help.xml
-Function New-ProgressBar 
-{
+Function New-ProgressBar {
  
     param(
-        [Parameter(ParameterSetName = "Standard")]
-        [Parameter(ParameterSetName='MaterialDesign')]
-        [ValidateSet($True,$False)]
+        
+        [Parameter(ParameterSetName = 'Standard')]
+        [Parameter(ParameterSetName = 'MaterialDesign')]
+        [String]$IconPath,
+        
+        [Parameter(ParameterSetName = 'Standard')]
+        [Parameter(ParameterSetName = 'MaterialDesign')]
         [Bool]$IsIndeterminate = $True,
 
-        [Parameter(Position = 0, Mandatory = $True, ParameterSetName='MaterialDesign')]
+        [Parameter(ParameterSetName = 'MaterialDesign', Mandatory = $true)]
         [switch]$MaterialDesign,
         
-        [Parameter(ParameterSetName='MaterialDesign')]
-        [ValidateSet("Circle","Horizontal","Vertical")]
+        [Parameter(ParameterSetName = 'MaterialDesign')]
+        [ValidateSet("Circle", "Horizontal", "Vertical")]
         [String]$Type = "Horizontal",
 
-        [Parameter(ParameterSetName='MaterialDesign')]
-        [ValidateSet("Red","Pink","Purple","DeepPurple","Indigo",
-                      "Blue","LightBlue","Cyan","Teal","Green","LightGreen",
-                      "Lime","Yellow","Amber","Orange","DeepOrange","Brown",
-                      "Grey","BlueGrey")]
+        [Parameter(ParameterSetName = 'MaterialDesign')]
+        [ValidateSet("Red", "Pink", "Purple", "DeepPurple", "Indigo",
+            "Blue", "LightBlue", "Cyan", "Teal", "Green", "LightGreen",
+            "Lime", "Yellow", "Amber", "Orange", "DeepOrange", "Brown",
+            "Grey", "BlueGrey")]
         [String]$PrimaryColor = "Blue",
 
-        [Parameter(ParameterSetName='MaterialDesign')]
-        [ValidateSet("Red","Pink","Purple","DeepPurple","Indigo",
-                      "Blue","LightBlue","Cyan","Teal","Green","LightGreen",
-                      "Lime","Yellow","Amber","Orange","DeepOrange")]
+        [Parameter(ParameterSetName = 'MaterialDesign')]
+        [ValidateSet("Red", "Pink", "Purple", "DeepPurple", "Indigo",
+            "Blue", "LightBlue", "Cyan", "Teal", "Green", "LightGreen",
+            "Lime", "Yellow", "Amber", "Orange", "DeepOrange")]
         [String]$AccentColor = "LightBlue",
 
-        [Parameter(ParameterSetName = "Standard")]
-        [Parameter(ParameterSetName='MaterialDesign')]
-        [ValidateSet("Large","Medium","Small")]
+        [Parameter(ParameterSetName = 'Standard')]
+        [Parameter(ParameterSetName = 'MaterialDesign')]
+        [ValidateSet("Large", "Medium", "Small")]
         [String]$Size = "Medium",
 
-        [Parameter(ParameterSetName='MaterialDesign')]
-        [ValidateSet("Dark","Light")]
+        [Parameter(ParameterSetName = 'MaterialDesign')]
+        [ValidateSet("Dark", "Light")]
         [String]$Theme = "Light"
     )
 
-    $ProgressSize = @{"Small"=140;"Medium"=280;"Large"=560}
+    $ProgressSize = @{"Small" = 140; "Medium" = 280; "Large" = 560 }
 
-    [void][System.Reflection.Assembly]::LoadWithPartialName('presentationframework') 
-    $syncHash = [hashtable]::Synchronized(@{})
-    $newRunspace =[runspacefactory]::CreateRunspace()
+    [System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms') | Out-Null
+    [System.Reflection.Assembly]::LoadWithPartialName('presentationframework') | Out-Null
+    $syncHash = [hashtable]::Synchronized(@{ })
+    $newRunspace = [runspacefactory]::CreateRunspace()
     $syncHash.Runspace = $newRunspace
+    $syncHash.Closing = $False
     $syncHash.SecondsRemainingInput = $Null
     $syncHash.StatusInput = ''
     $syncHash.CurrentOperationInput = ''
+    $syncHash.IconPath = $IconPath
     $syncHash.XAML = @" 
         <Window 
             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
@@ -64,6 +70,16 @@ Function New-ProgressBar
 '@
             
             })
+
+            $(
+            if($SyncHash.IconPath){
+                
+                @"
+                Icon="$($SyncHash.IconPath)"
+"@
+
+}
+            )
             
             >
             $(
@@ -149,97 +165,167 @@ Function New-ProgressBar
     $newRunspace.ApartmentState = "STA" 
     $newRunspace.ThreadOptions = "ReuseThread"           
     $data = $newRunspace.Open() | Out-Null
-    $newRunspace.SessionStateProxy.SetVariable("syncHash",$syncHash)
+    $newRunspace.SessionStateProxy.SetVariable("syncHash", $syncHash)
     
     
               
-    $PowerShellCommand = [PowerShell]::Create().AddScript({    
+    $PowerShellCommand = [PowerShell]::Create().AddScript( {    
  
    
-        $syncHash.Window=[Windows.Markup.XamlReader]::parse( $SyncHash.XAML ) 
-        #===========================================================================
-        # Store Form Objects In PowerShell
-        #===========================================================================
-        ([xml]$SyncHash.XAML).SelectNodes("//*[@Name]") | %{ $SyncHash."$($_.Name)" = $SyncHash.Window.FindName($_.Name)}
-        $TimeRemaining = [System.TimeSpan]
+            $syncHash.Window = [Windows.Markup.XamlReader]::parse( $SyncHash.XAML ) 
+            #===========================================================================
+            # Store Form Objects In PowerShell
+            #===========================================================================
+            ([xml]$SyncHash.XAML).SelectNodes("//*[@Name]") | % { $SyncHash."$($_.Name)" = $SyncHash.Window.FindName($_.Name) }
+            $TimeRemaining = [System.TimeSpan]
 
-        $updateBlock = {            
-            if($SyncHash.ProgressBar.IsIndeterminate){
-                $SyncHash.PercentCompleteTextBlock.Visibility = [System.Windows.Visibility]::Hidden
-            } else {
-                $SyncHash.PercentCompleteTextBlock.Visibility = [System.Windows.Visibility]::Visible
-            }
+            $updateBlock = {
+                if ($SyncHash.ProgressBar.IsIndeterminate) {
+                    $SyncHash.PercentCompleteTextBlock.Visibility = [System.Windows.Visibility]::Hidden
+                }
+                else {
+                    $SyncHash.PercentCompleteTextBlock.Visibility = [System.Windows.Visibility]::Visible
+                }            
+            
+            
+                if ($SyncHash.Closing -eq $True) {
 
-            $SyncHash.Window.Title = $SyncHash.Activity
-            $SyncHash.ProgressBar.Value = $SyncHash.PercentComplete
-            if([string]::IsNullOrEmpty($SyncHash.PercentComplete) -ne $True -and $SyncHash.ProgressBar.IsIndeterminate -eq $True)
-            {
+                    $SyncHash.NotifyIcon.Visible = $false
+                    $syncHash.Window.Close()
+                    [System.Windows.Forms.Application]::Exit()
+                    Break
+                }
+            
+            
+                $SyncHash.Window.Title = $SyncHash.Activity
+                $SyncHash.ProgressBar.Value = $SyncHash.PercentComplete
+                if ([string]::IsNullOrEmpty($SyncHash.PercentComplete) -ne $True -and $SyncHash.ProgressBar.IsIndeterminate -eq $True) {
 
-                $SyncHash.ProgressBar.IsIndeterminate = $False
+                    $SyncHash.ProgressBar.IsIndeterminate = $False
 
-            }
-            $SyncHash.Status.Text = $SyncHash.StatusInput
-            if($SyncHash.SecondsRemainingInput)
-            {
-                $TimeRemaining = [System.TimeSpan]::FromSeconds($SyncHash.SecondsRemainingInput)
-                $SyncHash.TimeRemaining.Text = '{0:00}:{1:00}:{2:00}' -f $TimeRemaining.Hours,$TimeRemaining.Minutes,$TimeRemaining.Seconds
-            }
-            $SyncHash.CurrentOperation.Text = $SyncHash.CurrentOperationInput
-            #$SyncHash.Window.MinWidth = $SyncHash.Window.ActualWidth
+                }
+                $SyncHash.Status.Text = $SyncHash.StatusInput
+                if ($SyncHash.SecondsRemainingInput) {
+                    $TimeRemaining = [System.TimeSpan]::FromSeconds($SyncHash.SecondsRemainingInput)
+                    $SyncHash.TimeRemaining.Text = '{0:00}:{1:00}:{2:00}' -f $TimeRemaining.Hours, $TimeRemaining.Minutes, $TimeRemaining.Seconds
+                }
+                $SyncHash.CurrentOperation.Text = $SyncHash.CurrentOperationInput
+            
+                $SyncHash.NotifyIcon.text = "Activity: $($SyncHash.Activity)`nPercent Complete: $($SyncHash.PercentComplete)"
                        
-        }
+            }
 
-        ############### New Blog ##############
-        $syncHash.Window.Add_SourceInitialized( {            
-            ## Before the window's even displayed ...            
-            ## We'll create a timer            
-            $timer = new-object System.Windows.Threading.DispatcherTimer            
-            ## Which will fire 4 times every second            
-            $timer.Interval = [TimeSpan]"0:0:0.01"            
-            ## And will invoke the $updateBlock            
-            $timer.Add_Tick( $updateBlock )            
-            ## Now start the timer running            
-            $timer.Start()            
-            if( $timer.IsEnabled ) {            
-               Write-Host "Clock is running. Don't forget: RIGHT-CLICK to close it."            
-            } else {            
-               $clock.Close()            
-               Write-Error "Timer didn't start"            
-            }            
-        } )
+            ############### New Blog ##############
+            $syncHash.Window.Add_SourceInitialized( {            
+                    ## Before the window's even displayed ...            
+                    ## We'll create a timer            
+                    $timer = new-object System.Windows.Threading.DispatcherTimer            
+                    ## Which will fire 4 times every second            
+                    $timer.Interval = [TimeSpan]"0:0:0.01"            
+                    ## And will invoke the $updateBlock            
+                    $timer.Add_Tick( $updateBlock )            
+                    ## Now start the timer running            
+                    $timer.Start()            
+                    if ( $timer.IsEnabled ) {            
+                           
+                    }
+                    else {            
+                        $clock.Close()            
+                        Write-Error "Timer didn't start"            
+                    }            
+                } )
 
-        $syncHash.Window.ShowDialog() | Out-Null 
-        $syncHash.Error = $Error 
 
-    }) 
+            # Extract icon from PowerShell to use as the NotifyIcon
+
+            if ($syncHash.IconPath) {
+
+                $icon = [System.Drawing.Icon]::new($syncHash.IconPath)
+                $syncHash.Window.Icon = $Icon
+
+            }
+            else {
+        
+                $icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$pshome\powershell.exe")
+        
+            }
+
+            # Create notifyicon, and right-click -> Exit menu
+            $SyncHash.NotifyIcon = New-Object System.Windows.Forms.NotifyIcon
+            $SyncHash.NotifyIcon.Text = "Activity: $($SyncHash.Activity)`nPercent Complete: $($SyncHash.PercentComplete)"
+            $SyncHash.NotifyIcon.Icon = $icon
+            $SyncHash.NotifyIcon.Visible = $true
+
+            $menuitem = New-Object System.Windows.Forms.MenuItem
+            $menuitem.Text = "Exit"
+
+            $contextmenu = New-Object System.Windows.Forms.ContextMenu
+            $SyncHash.NotifyIcon.ContextMenu = $contextmenu
+            $SyncHash.NotifyIcon.contextMenu.MenuItems.AddRange($menuitem)
+
+            $SyncHash.NotifyIcon.add_DoubleClick( { $synchash.window.Show() })
+
+
+            # When Exit is clicked, close everything and kill the PowerShell process
+            $menuitem.add_Click( {
+                    $SyncHash.NotifyIcon.Visible = $false
+                    $syncHash.Closing = $True
+                    $syncHash.Window.Close()
+                    [System.Windows.Forms.Application]::Exit()
+
+                })
+
+            $Synchash.window.Add_Closing( {
+         
+                    if ($SyncHash.Closing -eq $True) {
+                
+                    }
+                    else {
+                
+                        $SyncHash.Window.Hide()
+                        $SyncHash.NotifyIcon.BalloonTipTitle = "Your script is still running..."
+                        $SyncHash.NotifyIcon.BalloonTipText = "Double click to open the progress bar again."
+                        $SyncHash.NotifyIcon.ShowBalloonTip(100)
+                        $_.Cancel = $true
+
+                    }
+         
+                })
+
+
+        
+            $syncHash.Window.Show() | Out-Null
+            $appContext = [System.Windows.Forms.ApplicationContext]::new()
+            [void][System.Windows.Forms.Application]::Run($appContext) 
+            $syncHash.Error = $Error 
+
+        }) 
     $PowerShellCommand.Runspace = $newRunspace 
     $data = $PowerShellCommand.BeginInvoke() 
    
     
     Register-ObjectEvent -InputObject $SyncHash.Runspace `
-            -EventName 'AvailabilityChanged' `
-            -Action { 
+        -EventName 'AvailabilityChanged' `
+        -Action { 
                 
-                    if($Sender.RunspaceAvailability -eq "Available")
-                    {
-                        $Sender.Closeasync()
-                        $Sender.Dispose()
-                    } 
+        if ($Sender.RunspaceAvailability -eq "Available") {
+            $Sender.Closeasync()
+            $Sender.Dispose()
+        } 
                 
-                } | Out-Null
+    } | Out-Null
 
     return $syncHash
 
 }
 
 #.ExternalHelp PoshProgressBar.psm1-help.xml
-function Write-ProgressBar
-{
+function Write-ProgressBar {
 
     Param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         $ProgressBar,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]$Activity,
         [int]$PercentComplete,
         [String]$Status = $Null,
@@ -247,15 +333,16 @@ function Write-ProgressBar
         [String]$CurrentOperation = $Null
     ) 
    
-   Write-Verbose -Message "Setting activity to $Activity"
-   $ProgressBar.Activity = $Activity
+    if ($ProgressBar.Closing -eq $true) { exit }
 
-   if($PercentComplete)
-   {
+    Write-Verbose -Message "Setting activity to $Activity"
+    $ProgressBar.Activity = $Activity
+
+    if ($PercentComplete) {
        
-       $ProgressBar.PercentComplete = $PercentComplete
+        $ProgressBar.PercentComplete = $PercentComplete
 
-   }
+    }
    
 
     $ProgressBar.SecondsRemainingInput = $SecondsRemaining
@@ -267,20 +354,13 @@ function Write-ProgressBar
 }
 
 #.ExternalHelp PoshProgressBar.psm1-help.xml
-function Close-ProgressBar
-{
+function Close-ProgressBar {
 
     Param (
-        [Parameter(Mandatory=$true)]
-        [System.Object[]]$ProgressBar
+        [Parameter(Mandatory = $true)]
+        $ProgressBar
     )
 
-    $ProgressBar.Window.Dispatcher.InvokeAsync([action]{ 
-      
-      $ProgressBar.Window.close()
-
-    }, "Normal")
-
-    $ProgressBar.Runspace.CloseAsync() | Out-Null
+    $ProgressBar.Closing = $True
 
 }
