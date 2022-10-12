@@ -2,9 +2,22 @@
 # PoshProgressBar
 A PowerShell ProgressBar in XAML using Material Design in XAML Toolkit from ButchersBoy
 
-# [The Website](http://tiberriver256.github.io/PoshProgressBar/ "The Website")
+## Sample usage
 
-# TODO
+```pwsh
+$progressBar = New-ProgressBar -IsIndeterminate $true -MaterialDesign -Type Circle
+Write-ProgressBar -Activity "Doing things" -ProgressBar $progressBar -Status "Status" -CurrentOperation "Current Operation"
+```
+
+Result:
+
+![Sample Progress Bar](./sample-progress-bar.gif)
+
+## [The Website](https://tiberriver256.github.io/PoshProgressBar/ "The Website")
+
+The website has a little utility that will help you pick your available options
+
+## TODO
 
 1. Automated Screenshots for documentation
 2. Backwards compatibility and ??Server 2012 Compatibility??
@@ -13,7 +26,7 @@ A PowerShell ProgressBar in XAML using Material Design in XAML Toolkit from Butc
 5. Add MahApps styling
 
 
-# Contribution Guidelines
+## Contribution Guidelines
 
 Nothing too formal.
 
