@@ -1,38 +1,66 @@
-[![Board Status](https://tiberriver256.visualstudio.com/be77c668-1e13-4360-aa08-264b1d5f64c6/37c8e3a8-220a-47b9-8b2f-13dd17f11c6d/_apis/work/boardbadge/dc0051f8-bff5-4b7d-93ff-2a4b573f1dcf)](https://tiberriver256.visualstudio.com/be77c668-1e13-4360-aa08-264b1d5f64c6/_boards/board/t/37c8e3a8-220a-47b9-8b2f-13dd17f11c6d/Microsoft.RequirementCategory)
 # PoshProgressBar
-A PowerShell ProgressBar in XAML using Material Design in XAML Toolkit from ButchersBoy
+
+A PowerShell progress bar in XAML using the Material Design in XAML Toolkit.
+
+## Install
+
+```powershell
+Install-Module PoshProgressBar -Scope CurrentUser
+Import-Module PoshProgressBar
+```
+
+## Compatibility
+
+> **Windows only.** Requires **Windows PowerShell 5.1+** with WPF
+> (`PresentationFramework`, .NET Framework 4.x). Not supported on Linux, macOS,
+> or PowerShell 7+ (the vendored Material Design assemblies target .NET
+> Framework 4.0 — see [THIRD-PARTY-NOTICES.md](./THIRD-PARTY-NOTICES.md)).
 
 ## Sample usage
 
-```pwsh
+```powershell
 $progressBar = New-ProgressBar -IsIndeterminate $true -MaterialDesign -Type Circle
 Write-ProgressBar -Activity "Doing things" -ProgressBar $progressBar -Status "Status" -CurrentOperation "Current Operation"
+# ...
+Close-ProgressBar -ProgressBar $progressBar
 ```
 
 Result:
 
 ![Sample Progress Bar](./sample-progress-bar.gif)
 
-## [The Website](https://tiberriver256.github.io/PoshProgressBar/ "The Website")
+With window options (see [CHANGELOG.md](./CHANGELOG.md)):
 
-The website has a little utility that will help you pick your available options
+```powershell
+$progressBar = New-ProgressBar -MaterialDesign -Type Horizontal `
+    -Topmost $true -ResizeMode NoResize -ShowInTaskbar $true `
+    -PicturePath "C:\Images\logo.png"
+```
 
-## TODO
+## Documentation
 
-1. Automated Screenshots for documentation
-2. Backwards compatibility and ??Server 2012 Compatibility??
-3. Closing progressbar shrinks it to notification tray
-4. Branding (.ico, Banner, Background)
-5. Add MahApps styling
+- Full per-command help with examples: [`PoshProgressBar/PoshProgressBar.psm1-help.xml`](./PoshProgressBar/PoshProgressBar.psm1-help.xml)
+- Changes: [CHANGELOG.md](./CHANGELOG.md)
+- Vendored dependency provenance: [THIRD-PARTY-NOTICES.md](./THIRD-PARTY-NOTICES.md)
+- Companion site with an option picker: <https://tiberriver256.github.io/PoshProgressBar/>
 
+## Roadmap
 
-## Contribution Guidelines
+Tracked as GitHub issues ([all open issues](https://github.com/Tiberriver256/PoshProgressBar/issues)):
 
-Nothing too formal.
+1. Automated screenshots for documentation
+2. Backwards compatibility / Server 2012 verification
+3. Branding (icon, banner, background)
+4. MahApps styling
+5. NuGet-based MaterialDesign dependency instead of vendored DLLs
 
-1. Find an issue / feature reqeust or create your own [here](https://github.com/Tiberriver256/PoshProgressBar/issues)
-2. Assign it to yourself
-3. Fork it
-4. Code it
-5. Submit the pull request to the **Development** branch.
-6. I'll verify with testing everything looks good and then merge it with the master, and add it to the PowerShell Gallery
+## Contributing
+
+1. Find or open an [issue](https://github.com/Tiberriver256/PoshProgressBar/issues) and assign it to yourself.
+2. Fork, branch from `Development`, and add Pester coverage for behavior changes.
+3. `Invoke-ScriptAnalyzer -Path ./PoshProgressBar -Settings ./PSScriptAnalyzerSettings.psd1` must be clean.
+4. Open a pull request against the **Development** branch. CI runs Pester + PSScriptAnalyzer on Windows.
+
+## License
+
+MIT — see [LICENSE.md](./LICENSE.md). Third-party binaries are covered in [THIRD-PARTY-NOTICES.md](./THIRD-PARTY-NOTICES.md).

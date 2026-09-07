@@ -12,10 +12,10 @@
 RootModule = 'PoshProgressBar.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.133'
+ModuleVersion = '0.134'
 
-# Supported PSEditions
-# CompatiblePSEditions = @()
+# Supported PSEditions (WPF/STA runspace UI: Windows PowerShell Desktop only)
+CompatiblePSEditions = @('Desktop')
 
 # ID used to uniquely identify this module
 GUID = 'e6a8d048-089c-4fb0-8bf4-5e42dae30126'
@@ -27,13 +27,14 @@ Author = 'Micah Rairdon'
 CompanyName = 'Unknown'
 
 # Copyright statement for this module
-Copyright = '(c) 2015 Micah Rairdon. All rights reserved.'
+Copyright = '(c) 2015-2026 Micah Rairdon. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'A module for creating WPF progress bars using XAML and the Material Design Toolkit by Butchers Boy'
 
 # Minimum version of the Windows PowerShell engine required by this module
-PowerShellVersion = '2.0'
+# (5.1: WPF XAML UI, Add-Type -AssemblyName, STA runspaces; see README Compatibility)
+PowerShellVersion = '5.1'
 
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
@@ -98,19 +99,19 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = @('ProgressBar', 'WPF', 'XAML', 'MaterialDesign', 'Windows')
 
         # A URL to the license for this module.
-        # LicenseUri = ''
+        LicenseUri = 'https://github.com/Tiberriver256/PoshProgressBar/blob/master/LICENSE.md'
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/Tiberriver256/PoshProgressBar'
 
         # A URL to an icon representing this module.
         # IconUri = ''
 
         # ReleaseNotes of this module
-        # ReleaseNotes = ''
+        ReleaseNotes = '0.134: fixed Write-ProgressBar host-kill (exit -> warning+return); fixed $clock timer typo; fixed window Icon assignment; 0% updates no longer dropped; window options from issue #17 (Topmost/ResizeMode/ShowInTaskbar/PicturePath/ShowOnPrimaryMonitor); modern assembly loading; Gallery metadata; see CHANGELOG.md.'
 
         # External dependent modules of this module
         # ExternalModuleDependencies = ''

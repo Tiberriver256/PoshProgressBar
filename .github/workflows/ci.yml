@@ -1,0 +1,38 @@
+name: CI
+on:
+  push:
+    branches: [master, Development, 'bb/**']
+  pull_request:
+    branches: [master, Development]
+
+jobs:
+  lint-and-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer and Pester
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          Install-Module Pester -Force -Scope CurrentUser -MinimumVersion 5.0 -SkipPublisherCheck
+
+      - name: PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          $results = Invoke-ScriptAnalyzer -Path ./PoshProgressBar/PoshProgressBar.psm1 -Settings ./PSScriptAnalyzerSettings.psd1
+          $results | Format-Table -AutoSize | Out-String | Write-Host
+          $errors = $results | Where-Object Severity -eq 'Error'
+          if ($errors) { throw "PSScriptAnalyzer found $($errors.Count) error(s)." }
+
+      - name: Validate manifest
+        shell: pwsh
+        run: |
+          $manifest = Test-ModuleManifest -Path ./PoshProgressBar/PoshProgressBar.psd1
+          $manifest | Format-List Name, Version | Out-String | Write-Host
+
+      - name: Pester tests
+        shell: pwsh
+        run: |
+          Invoke-Pester -Path ./tests -Output Detailed
